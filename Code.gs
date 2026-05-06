@@ -5,10 +5,11 @@
 
 function doGet() {
   return HtmlService
-    .createHtmlOutputFromFile('index') // Load your index.html file
+    .createHtmlOutputFromFile('index')
     .setTitle('Gold Tracker')
-    .addMetaTag('viewport', 'width=device-width, initial-scale=1') // Fixes mobile zoom
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL); // Allows embedding[cite: 1]
+    // This forces the app to fit the phone screen exactly
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
 /**
