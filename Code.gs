@@ -5,11 +5,10 @@
 
 function doGet() {
   return HtmlService
-    .createHtmlOutputFromFile('index')
+    .createHtmlOutputFromFile('index') // Load your index.html file
     .setTitle('Gold Tracker')
-    // This is the missing piece that forces the mobile zoom
-    .addMetaTag('viewport', 'width=device-width, initial-scale=1')
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1') // Fixes mobile zoom
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL); // Allows embedding[cite: 1]
 }
 
 /**
