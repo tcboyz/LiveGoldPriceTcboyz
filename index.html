@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Gold Tracker</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#f5f2ee;color:#1a1a1a;font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;justify-content:center;padding:16px}
+  .app{width:100%;max-width:400px;display:flex;flex-direction:column;gap:12px;padding-top:20px}
+  .header{text-align:center;padding:8px 0 16px}
+  .logo{font-size:10px;letter-spacing:0.2em;color:#b0a898;text-transform:uppercase;margin-bottom:8px;font-family:'DM Mono',monospace}
+  h1{font-size:24px;font-weight:600;color:#1a1a1a;letter-spacing:-0.02em}
+  .live-card{background:linear-gradient(135deg,#c8a96e 0%,#b8924e 100%);border-radius:18px;padding:20px 22px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 20px rgba(184,146,78,0.3)}
+  .live-left .lbl{font-size:10px;color:rgba(255,255,255,0.7);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px;font-family:'DM Mono',monospace}
+  .price-row{display:flex;align-items:baseline;gap:4px}
+  .price-rm{font-size:15px;font-weight:400;color:rgba(255,255,255,0.8);font-family:'DM Mono',monospace}
+  .price-val{font-size:34px;font-weight:500;color:#fff;font-variant-numeric:tabular-nums;font-family:'DM Mono',monospace;letter-spacing:-0.02em}
+  .live-badge{display:flex;flex-direction:column;align-items:center;gap:6px}
+  .pulse{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.4)}
+  .pulse.live{background:#fff;animation:pulse 2s infinite}
+  .pulse.error{background:#ff6b6b}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(1.6)}}
+  .badge-txt{font-size:9px;font-weight:600;letter-spacing:0.12em;color:rgba(255,255,255,0.7);font-family:'DM Mono',monospace}
+  .badge-txt.live{color:#fff}
+  .badge-txt.error{color:#ff6b6b}
+  .status-msg{font-size:11px;text-align:center;color:#b0a898;min-height:16px;font-family:'DM Mono',monospace}
+  .input-section{background:#fff;border:1px solid #e8e2d9;border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:16px;box-shadow:0 1px 4px rgba(0,0,0,0.04)}
+  .input-row{display:flex;flex-direction:column;gap:7px}
+  .input-row label{font-size:10px;color:#a09888;letter-spacing:0.1em;text-transform:uppercase;font-weight:500;font-family:'DM Mono',monospace}
+  .input-wrap{display:flex;align-items:center;border:1.5px solid #e8e2d9;border-radius:10px;overflow:hidden;background:#faf8f5;transition:border-color 0.2s}
+  .input-wrap:focus-within{border-color:#c8a96e}
+  .unit-tag{padding:0 14px;font-size:13px;color:#a09888;border-right:1.5px solid #e8e2d9;height:48px;display:flex;align-items:center;white-space:nowrap;font-family:'DM Mono',monospace;background:#f5f2ee}
+  .unit-tag.right{border-right:none;border-left:1.5px solid #e8e2d9}
+  .input-wrap input{flex:1;border:none;background:transparent;padding:0 14px;height:48px;font-size:18px;font-weight:500;color:#1a1a1a;outline:none;font-variant-numeric:tabular-nums;width:100%;font-family:'DM Mono',monospace}
+  .input-wrap input::placeholder{color:#ccc5b9;font-weight:400;font-size:15px}
+  .divider{height:1px;background:#f0ebe4}
+  .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .stat-card{background:#fff;border:1px solid #e8e2d9;border-radius:14px;padding:14px 16px;box-shadow:0 1px 4px rgba(0,0,0,0.03)}
+  .s-label{font-size:9px;color:#b0a898;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px;font-weight:500;font-family:'DM Mono',monospace}
+  .s-value{font-size:21px;font-weight:500;color:#1a1a1a;font-variant-numeric:tabular-nums;font-family:'DM Mono',monospace}
+  .s-unit{font-size:12px;font-weight:400;color:#b0a898}
+  .asset-full{grid-column:1/-1;background:#fff;border:1px solid #e8e2d9;border-radius:14px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,0.03)}
+  .asset-full .s-value{font-size:30px}
+  .asset-full .s-value.ready{color:#2d7a3a}
+  .asset-full .s-value.pending{color:#d8d0c6}
+  .asset-note{font-size:11px;color:#b0a898;margin-top:6px;font-family:'DM Mono',monospace}
+  .pnl-card{grid-column:1/-1;border-radius:14px;padding:18px;border:1px solid #e8e2d9;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,0.03)}
+  .pnl-value{font-size:26px;font-weight:500;font-variant-numeric:tabular-nums;color:#d8d0c6;font-family:'DM Mono',monospace}
+  .pnl-value.gain{color:#2d7a3a}
+  .pnl-value.loss{color:#c0392b}
+  .pnl-sub{font-size:11px;color:#b0a898;margin-top:4px;font-family:'DM Mono',monospace}
+  .refresh-btn{width:100%;border:1.5px solid #e8e2d9;border-radius:12px;padding:13px;font-size:13px;color:#8a7e72;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background 0.15s,border-color 0.15s;font-family:'DM Mono',monospace;letter-spacing:0.04em;box-shadow:0 1px 4px rgba(0,0,0,0.04)}
+  .refresh-btn:hover{background:#faf8f5;border-color:#c8a96e;color:#b8924e}
+  .refresh-btn:disabled{opacity:0.4;cursor:not-allowed}
+  .spin{display:inline-block;animation:spin 0.8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .timestamp{font-size:10px;color:#c0b8ae;text-align:center;padding-bottom:12px;font-family:'DM Mono',monospace}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="logo">live feed</div>
+    <h1>Gold Portfolio</h1>
+  </div>
+  <div class="live-card">
+    <div class="live-left">
+      <div class="lbl">Live Price / gram</div>
+      <div class="price-row">
+        <span class="price-rm">RM</span>
+        <span class="price-val" id="price-val">—</span>
+      </div>
+    </div>
+    <div class="live-badge">
+      <div class="pulse" id="pulse-dot"></div>
+      <span class="badge-txt" id="live-label">LOADING</span>
+    </div>
+  </div>
+  <div class="status-msg" id="status-msg">Connecting…</div>
+  <div class="input-section">
+    <div class="input-row">
+      <label>Total Weight</label>
+      <div class="input-wrap">
+        <input type="number" id="inp-weight" placeholder="0.00" min="0" step="0.01" inputmode="decimal"/>
+        <div class="unit-tag right">gram</div>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="input-row">
+      <label>Total Investment</label>
+      <div class="input-wrap">
+        <div class="unit-tag">RM</div>
+        <input type="number" id="inp-invest" placeholder="0.00" min="0" step="0.01" inputmode="decimal"/>
+      </div>
+    </div>
+  </div>
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="s-label">Weight</div>
+      <div class="s-value" id="disp-weight">—<span class="s-unit"> g</span></div>
+    </div>
+    <div class="stat-card">
+      <div class="s-label">Invested</div>
+      <div class="s-value" id="disp-invest">—<span class="s-unit"> RM</span></div>
+    </div>
+    <div class="asset-full">
+      <div class="s-label">Total Asset Value</div>
+      <div class="s-value pending" id="disp-asset">—</div>
+      <div class="asset-note" id="asset-note">Enter weight to calculate</div>
+    </div>
+    <div class="pnl-card">
+      <div class="s-label">Gain / Loss</div>
+      <div class="pnl-value" id="disp-pnl">—</div>
+      <div class="pnl-sub" id="pnl-sub"></div>
+    </div>
+  </div>
+  <button class="refresh-btn" id="refresh-btn" onclick="fetchPrice()">
+    <span id="refresh-icon">↻</span> Refresh live price
+  </button>
+  <div class="timestamp" id="timestamp"></div>
+</div>
+<script>
+  let livePrice = null;
+  function fetchPrice() {
+    const icon = document.getElementById('refresh-icon');
+    const statusMsg = document.getElementById('status-msg');
+    const pulseDot = document.getElementById('pulse-dot');
+    const liveLabel = document.getElementById('live-label');
+    const btn = document.getElementById('refresh-btn');
+    icon.className = 'spin';
+    btn.disabled = true;
+    pulseDot.className = 'pulse';
+    liveLabel.className = 'badge-txt';
+    liveLabel.textContent = 'LOADING';
+    statusMsg.textContent = 'Fetching…';
+    google.script.run
+      .withSuccessHandler(function(result) {
+        icon.className = '';
+        btn.disabled = false;
+        if (result.success && result.price > 0) {
+          livePrice = result.price;
+          document.getElementById('price-val').textContent = livePrice.toFixed(2);
+          pulseDot.className = 'pulse live';
+          liveLabel.className = 'badge-txt live';
+          liveLabel.textContent = 'LIVE';
+          statusMsg.textContent = 'Price updated';
+          const now = new Date();
+          document.getElementById('timestamp').textContent =
+            'Last updated: ' + now.toLocaleTimeString('en-MY', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+        } else {
+          setOffline(result.error || 'Unknown error');
+        }
+        calculate();
+      })
+      .withFailureHandler(function(err) {
+        icon.className = '';
+        btn.disabled = false;
+        setOffline(err.message || 'Script error');
+        calculate();
+      })
+      .getRazakGoldPrice();
+  }
+  function setOffline(msg) {
+    document.getElementById('pulse-dot').className = 'pulse error';
+    document.getElementById('live-label').className = 'badge-txt error';
+    document.getElementById('live-label').textContent = 'OFFLINE';
+    document.getElementById('status-msg').textContent = 'Error: ' + msg;
+    document.getElementById('price-val').textContent = '—';
+    livePrice = null;
+  }
+  function calculate() {
+    const w = parseFloat(document.getElementById('inp-weight').value);
+    const inv = parseFloat(document.getElementById('inp-invest').value);
+    const hasWeight = !isNaN(w) && w > 0;
+    const hasInvest = !isNaN(inv) && inv > 0;
+    const hasPrice = livePrice !== null;
+    document.getElementById('disp-weight').innerHTML = hasWeight ? w.toFixed(2)+'<span class="s-unit"> g</span>' : '—<span class="s-unit"> g</span>';
+    document.getElementById('disp-invest').innerHTML = hasInvest ? inv.toFixed(2)+'<span class="s-unit"> RM</span>' : '—<span class="s-unit"> RM</span>';
+    const dispAsset = document.getElementById('disp-asset');
+    const assetNote = document.getElementById('asset-note');
+    const dispPnl = document.getElementById('disp-pnl');
+    const pnlSub = document.getElementById('pnl-sub');
+    if (hasWeight && hasPrice) {
+      const assetVal = w * livePrice;
+      dispAsset.className = 's-value ready';
+      dispAsset.textContent = 'RM ' + assetVal.toFixed(2);
+      assetNote.textContent = w.toFixed(2) + 'g × RM ' + livePrice.toFixed(2) + '/g';
+      if (hasInvest) {
+        const pnl = assetVal - inv;
+        const pct = (pnl / inv * 100);
+        const sign = pnl >= 0 ? '+' : '';
+        dispPnl.className = 'pnl-value ' + (pnl >= 0 ? 'gain' : 'loss');
+        dispPnl.textContent = sign + 'RM ' + Math.abs(pnl).toFixed(2);
+        pnlSub.textContent = sign + pct.toFixed(2) + '% vs cost basis';
+      } else {
+        dispPnl.className = 'pnl-value';
+        dispPnl.textContent = '—';
+        pnlSub.textContent = 'Enter investment to see gain/loss';
+      }
+    } else {
+      dispAsset.className = 's-value pending';
+      dispAsset.textContent = '—';
+      assetNote.textContent = !hasPrice ? 'Waiting for live price…' : 'Enter weight to calculate';
+      dispPnl.className = 'pnl-value';
+      dispPnl.textContent = '—';
+      pnlSub.textContent = '';
+    }
+  }
+  document.getElementById('inp-weight').addEventListener('input', calculate);
+  document.getElementById('inp-invest').addEventListener('input', calculate);
+  fetchPrice();
+  setInterval(fetchPrice, 120000);
+</script>
+</body>
+</html>
