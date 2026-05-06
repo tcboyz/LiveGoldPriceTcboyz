@@ -4,12 +4,10 @@
 // ============================================================
 
 function doGet() {
-  return HtmlService
-    .createHtmlOutputFromFile('index')
+  return HtmlService.createHtmlOutputFromFile('index')
     .setTitle('Gold Tracker')
-    // This forces the app to fit the phone screen exactly
-    .addMetaTag('viewport', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no')
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1') // Essential for mobile fit
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL); // Allows the iframe to work[cite: 1]
 }
 
 /**
