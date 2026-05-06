@@ -1,4 +1,4 @@
-🪙 Gold Tracker API & Web Interface
+🧈 Gold Tracker API & Web Interface
 A professional, mobile-responsive gold price tracking application. This project uses Google Apps Script as a backend API to fetch live data from razak.com.my and displays it via a clean, zero-scroll interface on GitHub Pages.
 
 🚀 Features
