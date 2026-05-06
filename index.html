@@ -1,94 +1,20 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 <style>
-  html, body {
+  body, html {
     margin: 0;
     padding: 0;
-    width: 100%;
     height: 100%;
-  }
-
-  /* Fix mobile iframe issues */
-  .iframe-container {
     width: 100%;
-    height: 100dvh; /* better than 100vh for mobile */
+    overflow: hidden; /* Prevents double scrollbars */
   }
 
   iframe {
     width: 100%;
-    height: 100%;
+    height: 100vh; /* Fills the mobile screen height */
     border: none;
     display: block;
   }
 </style>
-</head>
 
-<body>
-
-<!-- ✅ Responsive iframe wrapper -->
-<div class="iframe-container">
-  <iframe 
-    src="https://script.google.com/macros/s/AKfycbwUj0Ij1oQgHKHSZe7eycDzl-aUXKdbTCFw5iALGt0bLCaSWFarXt0tRxy_o0TEx9MkFg/exec">
-  </iframe>
-</div>
-
-<script>
-  let livePrice = null;
-
-  async function fetchPrice() {
-    const icon = document.getElementById('refresh-icon');
-    const statusMsg = document.getElementById('status-msg');
-    const btn = document.getElementById('refresh-btn');
-
-    if (icon) icon.className = 'spin';
-    if (btn) btn.disabled = true;
-    if (statusMsg) statusMsg.textContent = 'Fetching via API...';
-
-    const scriptURL = "https://script.google.com/macros/s/AKfycbwUj0Ij1oQgHKHSZe7eycDzl-aUXKdbTCFw5iALGt0bLCaSWFarXt0tRxy_o0TEx9MkFg/exec";
-
-    try {
-      const response = await fetch(scriptURL);
-      const result = await response.json();
-
-      if (icon) icon.className = '';
-      if (btn) btn.disabled = false;
-
-      if (result.success && result.price > 0) {
-        livePrice = result.price;
-
-        const priceEl = document.getElementById('price-val');
-        const timeEl = document.getElementById('timestamp');
-
-        if (priceEl) priceEl.textContent = livePrice.toFixed(2);
-        if (statusMsg) statusMsg.textContent = 'Price updated';
-
-        if (timeEl) {
-          const now = new Date();
-          timeEl.textContent = 'Last updated: ' + now.toLocaleTimeString();
-        }
-
-      } else {
-        setOffline(result.error || 'API Error');
-      }
-
-    } catch (err) {
-      if (icon) icon.className = '';
-      if (btn) btn.disabled = false;
-
-      setOffline('Connection Failed');
-      console.error("Fetch Error:", err);
-    }
-
-    if (typeof calculate === "function") {
-      calculate();
-    }
-  }
-
-  window.onload = fetchPrice;
-</script>
-
-</body>
-</html>
+<iframe src="https://script.google.com/macros/s/AKfycbwUj0Ij1oQgHKHSZe7eycDzl-aUXKdbTCFw5iALGt0bLCaSWFarXt0tRxy_o0TEx9MkFg/exec"></iframe>
