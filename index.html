@@ -2,3 +2,58 @@
   src="https://script.google.com/macros/s/AKfycbwUj0Ij1oQgHKHSZe7eycDzl-aUXKdbTCFw5iALGt0bLCaSWFarXt0tRxy_o0TEx9MkFg/exec" 
   style="width:100%; height:100vh; border:none;">
 </iframe>
+
+
+<!-- ... rest of your HTML ... -->
+
+<script>
+  let livePrice = null;
+
+  // PLACE THE NEW FUNCTION HERE
+  async function fetchPrice() {
+    const icon = document.getElementById('refresh-icon');
+    const statusMsg = document.getElementById('status-msg');
+    const btn = document.getElementById('refresh-btn');
+    
+    if(icon) icon.className = 'spin';
+    if(btn) btn.disabled = true;
+    statusMsg.textContent = 'Fetching via API...';
+
+    // Enter your Web App URL from Google Apps Script here
+    const scriptURL = "https://script.google.com/macros/s/AKfycbwUj0Ij1oQgHKHSZe7eycDzl-aUXKdbTCFw5iALGt0bLCaSWFarXt0tRxy_o0TEx9MkFg/exec"; 
+
+    try {
+      const response = await fetch(scriptURL);
+      const result = await response.json();
+      
+      if (icon) icon.className = '';
+      if (btn) btn.disabled = false;
+
+      if (result.success && result.price > 0) {
+        livePrice = result.price;
+        document.getElementById('price-val').textContent = livePrice.toFixed(2);
+        statusMsg.textContent = 'Price updated';
+        
+        // Update the timestamp
+        const now = new Date();
+        document.getElementById('timestamp').textContent = 
+          'Last updated: ' + now.toLocaleTimeString();
+      } else {
+        setOffline(result.error || 'API Error');
+      }
+    } catch (err) {
+      if (icon) icon.className = '';
+      if (btn) btn.disabled = false;
+      setOffline('Connection Failed');
+      console.error("Fetch Error:", err);
+    }
+    
+    // Call your calculation function to update the RM totals
+    calculate(); 
+  }
+
+  // Ensure the app fetches the price as soon as the page loads
+  window.onload = fetchPrice;
+
+  // ... rest of your calculation script ...
+</script>
